@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcpayments-api-config
+  labels:
+    app: tcpayments-api
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:5004"
+  PaymentRules__MaxPrecoAprovado: "200"
+  RabbitMq__HostName: "rabbitmq"
+  RabbitMq__Port: "5672"
+  RabbitMq__VirtualHost: "/"
+  RabbitMq__OrderPlacedQueue: "OrderPlaced"
+  RabbitMq__PaymentProcessedQueue: "PaymentProcessed"

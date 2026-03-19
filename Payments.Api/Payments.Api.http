@@ -1,4 +1,4 @@
-@Payments.Api_HostAddress = http://localhost:5254
+@Payments.Api_HostAddress = http://localhost:5004
 
 POST {{Payments.Api_HostAddress}}/api/payments/order-placed
 Content-Type: application/json

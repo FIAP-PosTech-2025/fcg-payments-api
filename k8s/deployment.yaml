@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcpayments-api
+  labels:
+    app: tcpayments-api
+spec:
+  replicas: 2
+  progressDeadlineSeconds: 600
+  selector:
+    matchLabels:
+      app: tcpayments-api
+  template:
+    metadata:
+      labels:
+        app: tcpayments-api
+    spec:
+      containers:
+        - name: tcpayments-api
+          image: tcpayments-img:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5004
+              name: http
+          envFrom:
+            - configMapRef:
+                name: tcpayments-api-config
+            - secretRef:
+                name: tcpayments-api-secret
+          readinessProbe:
+            tcpSocket:
+              port: 5004
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 5004
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5004
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

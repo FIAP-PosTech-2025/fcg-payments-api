@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcpayments-api
+  labels:
+    app: tcpayments-api
+spec:
+  selector:
+    app: tcpayments-api
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 5004
+  type: LoadBalancer

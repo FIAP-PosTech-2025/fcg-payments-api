@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+.git/
+.idea/
+.gitignore
+README.md
+Payments.Tests/

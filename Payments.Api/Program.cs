@@ -54,35 +54,31 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
 });
 
-builder.Services.AddOptions<DownstreamOptions>()
-    .Bind(builder.Configuration.GetSection(DownstreamOptions.SectionName))
-    .Validate(options => Uri.TryCreate(options.CatalogBaseUrl, UriKind.Absolute, out _),
-        "Downstream:CatalogBaseUrl deve ser uma URL absoluta.")
-    .Validate(options => Uri.TryCreate(options.NotificationsBaseUrl, UriKind.Absolute, out _),
-        "Downstream:NotificationsBaseUrl deve ser uma URL absoluta.")
-    .ValidateOnStart();
-
 builder.Services.AddOptions<PaymentRulesOptions>()
     .Bind(builder.Configuration.GetSection(PaymentRulesOptions.SectionName))
     .Validate(options => options.MaxPrecoAprovado > 0m,
         "PaymentRules:MaxPrecoAprovado deve ser maior que zero.")
     .ValidateOnStart();
 
-builder.Services.AddHttpClient("CatalogApi", (sp, client) =>
-{
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<DownstreamOptions>>().Value;
-    client.BaseAddress = new Uri(options.CatalogBaseUrl);
-});
-
-builder.Services.AddHttpClient("NotificationsApi", (sp, client) =>
-{
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<DownstreamOptions>>().Value;
-    client.BaseAddress = new Uri(options.NotificationsBaseUrl);
-});
+builder.Services.AddOptions<RabbitMqOptions>()
+    .Bind(builder.Configuration.GetSection(RabbitMqOptions.SectionName))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.HostName),
+        "RabbitMq:HostName deve ser informado.")
+    .Validate(options => !string.IsNullOrWhiteSpace(options.UserName),
+        "RabbitMq:UserName deve ser informado.")
+    .Validate(options => !string.IsNullOrWhiteSpace(options.Password),
+        "RabbitMq:Password deve ser informado.")
+    .Validate(options => !string.IsNullOrWhiteSpace(options.OrderPlacedQueue),
+        "RabbitMq:OrderPlacedQueue deve ser informado.")
+    .Validate(options => !string.IsNullOrWhiteSpace(options.PaymentProcessedQueue),
+        "RabbitMq:PaymentProcessedQueue deve ser informado.")
+    .ValidateOnStart();
 
 builder.Services.AddScoped<IOrderPaymentProcessor, DeterministicOrderPaymentProcessor>();
-builder.Services.AddScoped<IPaymentProcessedEventDispatcher, HttpPaymentProcessedEventDispatcher>();
+builder.Services.AddScoped<IPaymentProcessedEventDispatcher, RabbitMqPaymentProcessedEventDispatcher>();
 builder.Services.AddScoped<IPaymentFlowService, PaymentFlowService>();
+builder.Services.AddSingleton<OrderPlacedEventConsumer>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<OrderPlacedEventConsumer>());
 
 var app = builder.Build();
 
