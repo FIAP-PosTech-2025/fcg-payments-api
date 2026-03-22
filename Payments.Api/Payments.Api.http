@@ -1,0 +1,10 @@
+@Payments.Api_HostAddress = http://localhost:5004
+
+POST {{Payments.Api_HostAddress}}/api/payments/order-placed
+Content-Type: application/json
+
+{
+  "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "jogoId": "1fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "preco": 199.90
+}
