@@ -70,6 +70,8 @@ builder.Services.AddOptions<RabbitMqOptions>()
         "RabbitMq:Password deve ser informado.")
     .Validate(options => !string.IsNullOrWhiteSpace(options.OrderPlacedQueue),
         "RabbitMq:OrderPlacedQueue deve ser informado.")
+    .Validate(options => !string.IsNullOrWhiteSpace(options.PaymentProcessedExchange),
+        "RabbitMq:PaymentProcessedExchange deve ser informado.")
     .Validate(options => !string.IsNullOrWhiteSpace(options.PaymentProcessedQueue),
         "RabbitMq:PaymentProcessedQueue deve ser informado.")
     .ValidateOnStart();

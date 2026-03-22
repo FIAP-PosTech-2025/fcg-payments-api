@@ -39,11 +39,10 @@ public sealed class RabbitMqPaymentProcessedEventDispatcher : IPaymentProcessedE
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
-            channel.QueueDeclare(
-                queue: _options.PaymentProcessedQueue,
+            channel.ExchangeDeclare(
+                exchange: _options.PaymentProcessedExchange,
+                type: ExchangeType.Fanout,
                 durable: true,
-                exclusive: false,
-                autoDelete: false,
                 arguments: null);
 
             var body = JsonSerializer.SerializeToUtf8Bytes(paymentProcessedEvent);
@@ -55,14 +54,14 @@ public sealed class RabbitMqPaymentProcessedEventDispatcher : IPaymentProcessedE
             properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
             channel.BasicPublish(
-                exchange: string.Empty,
-                routingKey: _options.PaymentProcessedQueue,
+                exchange: _options.PaymentProcessedExchange,
+                routingKey: string.Empty,
                 basicProperties: properties,
                 body: body);
 
             _logger.LogInformation(
-                "PaymentProcessedEvent publicado na fila {QueueName} para UserId {UserId} e JogoId {JogoId}",
-                _options.PaymentProcessedQueue,
+                "PaymentProcessedEvent publicado no exchange {ExchangeName} para UserId {UserId} e JogoId {JogoId}",
+                _options.PaymentProcessedExchange,
                 paymentProcessedEvent.UserId,
                 paymentProcessedEvent.JogoId);
 

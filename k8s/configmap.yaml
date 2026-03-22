@@ -12,4 +12,5 @@ data:
   RabbitMq__Port: "5672"
   RabbitMq__VirtualHost: "/"
   RabbitMq__OrderPlacedQueue: "OrderPlaced"
-  RabbitMq__PaymentProcessedQueue: "PaymentProcessed"
+  RabbitMq__PaymentProcessedExchange: "PaymentProcessed"
+  RabbitMq__PaymentProcessedQueue: "PaymentProcessed.Payments"
